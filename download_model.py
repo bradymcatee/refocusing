@@ -30,16 +30,37 @@ def download_model():
 
         # Download with progress
         def progress_hook(count, block_size, total_size):
-            percent = int(count * block_size * 100 / total_size)
-            sys.stdout.write(f"\rDownloading: {percent}%")
-            sys.stdout.flush()
+            if total_size > 0:
+                percent = int(count * block_size * 100 / total_size)
+                sys.stdout.write(f"\rDownloading: {percent}%")
+                sys.stdout.flush()
+
+        # Set longer timeout for large file
+        import socket
+
+        socket.setdefaulttimeout(300)  # 5 minutes
 
         urllib.request.urlretrieve(MODEL_URL, MODEL_PATH, progress_hook)
         print("\n✓ Model downloaded successfully!")
-        return True
+
+        # Verify the file exists and has content
+        if (
+            os.path.exists(MODEL_PATH) and os.path.getsize(MODEL_PATH) > 1000000
+        ):  # > 1MB
+            print(
+                f"✓ Model file size: {os.path.getsize(MODEL_PATH) / (1024*1024):.1f} MB"
+            )
+            return True
+        else:
+            print("✗ Downloaded file seems incomplete")
+            return False
 
     except Exception as e:
         print(f"\n✗ Error downloading model: {e}")
+        print("Please check:")
+        print(f"  1. URL is correct: {MODEL_URL}")
+        print(f"  2. GitHub release exists and is public")
+        print(f"  3. Network connection is stable")
         return False
 
 

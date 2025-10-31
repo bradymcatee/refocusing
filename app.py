@@ -15,6 +15,14 @@ import os
 from src.models.multiscale_cnn import create_model
 from src.utils.refocusing import InteractiveRefocusing, process_torch_depth
 
+# Try to download model if it doesn't exist
+try:
+    from download_model import download_model
+
+    download_model()
+except Exception as e:
+    print(f"Note: Could not run download_model: {e}")
+
 # Initialize Flask app
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16MB max file size
@@ -202,6 +210,15 @@ def too_large(e):
 @app.errorhandler(500)
 def internal_error(e):
     return jsonify({"error": "Internal server error"}), 500
+
+
+# Load model when module is imported (works with gunicorn)
+print("Initializing model...")
+if not load_model():
+    print("WARNING: Model not loaded. App may not work correctly.")
+    print("Make sure checkpoints/best_model.pth exists.")
+else:
+    print(f"Model loaded on device: {device}")
 
 
 if __name__ == "__main__":
