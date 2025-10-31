@@ -1,3 +1,12 @@
+---
+title: Interactive Refocusing
+emoji: 📷
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_port: 7860
+---
+
 # Interactive Refocusing with Monocular Depth Estimation
 
 A web application that simulates DSLR-style shallow focus effects from single RGB images using CNN-based depth estimation. Built with Eigen et al.'s Multi-Scale CNN architecture for computational photography.
