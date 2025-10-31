@@ -44,14 +44,34 @@ def load_model():
 
     try:
         model = create_model()
-        checkpoint = torch.load(checkpoint_path, map_location=device)
-        model.load_state_dict(checkpoint["model_state_dict"])
+        # Load checkpoint with memory optimization
+        checkpoint = torch.load(
+            checkpoint_path,
+            map_location=device,
+            weights_only=True,  # Only load model weights, not optimizer state
+        )
+
+        # Handle both full checkpoint and weights-only formats
+        if "model_state_dict" in checkpoint:
+            model.load_state_dict(checkpoint["model_state_dict"])
+        else:
+            model.load_state_dict(checkpoint)
+
         model.to(device)
         model.eval()
+
+        # Free up memory
+        del checkpoint
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
         print("Model loaded successfully!")
         return True
     except Exception as e:
         print(f"Error loading model: {e}")
+        import traceback
+
+        traceback.print_exc()
         return False
 
 
