@@ -79,8 +79,7 @@ debug_*
 # Flask instance folder
 instance/
 
-# Docker
-Dockerfile
+# Docker (optional deployment files)
 docker-compose.yml
 nginx.conf
 *.service 
